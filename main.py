@@ -164,6 +164,13 @@ def uporabniki():
     users = db.query(Uporabnik).all()
     return render_template("uporabniki.html", uporabniki=users)
 
+
+@app.route("/uporabniki/<uporabnik_id>")
+def prikaz_uporabnika(uporabnik_id):
+    uporabnik = db.query(Uporabnik).filter_by(id=uporabnik_id).first()
+    return render_template("prikaz_uporabnika.html", uporabnik=uporabnik)
+
+
 if __name__ == '__main__':
     app.run(debug=True)
 

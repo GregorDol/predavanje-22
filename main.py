@@ -1,5 +1,7 @@
 import hashlib
 import random
+import requests
+import json
 import uuid
 from flask import Flask, render_template, request, redirect, make_response
 from modeli import Komentar, db, Uporabnik
@@ -165,10 +167,40 @@ def uporabniki():
     return render_template("uporabniki.html", uporabniki=users)
 
 
-@app.route("/uporabniki/<uporabnik_id>")
+@app.route("/uporabniki/<uporabnik_id>", methods=["GET", "POST"])
 def prikaz_uporabnika(uporabnik_id):
     uporabnik = db.query(Uporabnik).filter_by(id=uporabnik_id).first()
+
+    if request.method == "POST":
+
+        blokiran = False
+        if request.form.get("je_blokiran") == "on":
+            blokiran = True
+
+        uporabnik.je_blokiran = blokiran
+
+        db.add(uporabnik)
+        db.commit()
+
+
     return render_template("prikaz_uporabnika.html", uporabnik=uporabnik)
+
+
+@app.route("/vreme")
+def vreme():
+    mesto = "Maribor"
+
+    odgovor_geo = json.loads(requests.get("https://geocode.xyz/" + mesto + "?json=1").text)
+    lon = odgovor_geo["longt"]
+    lat = odgovor_geo["latt"]
+
+    url = "https://opendata.si/vreme/report/?lat=" + lat + "&lon=" + lon
+
+    odgovor = json.loads(requests.get(url).text)
+
+    dez = odgovor["forecast"]["data"][0]["rain"]
+
+    return render_template("vreme.html", vreme=dez)
 
 
 if __name__ == '__main__':

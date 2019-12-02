@@ -4,7 +4,16 @@
 
 <h1>Vreme</h1>
 
-V naslednjih urah bo zapadlo <strong>{{vreme}} ml</strong> dezja.
+{% if mesto %}
 
+    V naslednjih urah bo v mestu {{mesto}} zapadlo <strong>{{vreme}} ml</strong> dezja.
+
+{% else %}
+<form method="get">
+    <input name="lokacija" placeholder="Vpiši mesto">
+    <button type="submit">Pošlji</button>
+</form>
+
+{% endif %}
 
 {% endblock %}
